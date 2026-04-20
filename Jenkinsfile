@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Clone Repo') {
             steps {
-                git 'https://github.com/YOUR_USERNAME/linux-sre-project.git'
+                git 'https://github.com/kavithapn9111/linux-sre-project.git'
             }
         }
 
