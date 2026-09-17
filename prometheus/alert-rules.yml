@@ -1,0 +1,52 @@
+groups:
+  - name: linux-sre-alerts
+    rules:
+      - alert: InstanceDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+          team: sre
+        annotations:
+          summary: "Instance is down"
+          description: "Prometheus target {{ $labels.instance }} has been down for more than 1 minute."
+
+      - alert: HighCpuUsage
+        expr: 100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 85
+        for: 5m
+        labels:
+          severity: warning
+          team: sre
+        annotations:
+          summary: "High CPU usage detected"
+          description: "CPU usage is above 85 percent for more than 5 minutes on {{ $labels.instance }}."
+
+      - alert: HighMemoryUsage
+        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+          team: sre
+        annotations:
+          summary: "High memory usage detected"
+          description: "Memory usage is above 85 percent for more than 5 minutes on {{ $labels.instance }}."
+
+      - alert: HighDiskUsage
+        expr: (1 - (node_filesystem_avail_bytes{fstype!~"tmpfs|overlay"} / node_filesystem_size_bytes{fstype!~"tmpfs|overlay"})) * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+          team: sre
+        annotations:
+          summary: "High disk usage detected"
+          description: "Disk usage is above 85 percent on {{ $labels.instance }} mount {{ $labels.mountpoint }}."
+
+      - alert: FilesystemReadonly
+        expr: node_filesystem_readonly == 1
+        for: 2m
+        labels:
+          severity: critical
+          team: sre
+        annotations:
+          summary: "Filesystem is read-only"
+          description: "Filesystem {{ $labels.mountpoint }} on {{ $labels.instance }} is mounted read-only."

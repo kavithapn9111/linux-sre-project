@@ -1,0 +1,61 @@
+---
+- name: Linux baseline validation
+  hosts: linux_lab
+  gather_facts: true
+  become: false
+
+  tasks:
+    - name: Print host summary
+      ansible.builtin.debug:
+        msg:
+          - "Host: {{ inventory_hostname }}"
+          - "OS: {{ ansible_distribution }} {{ ansible_distribution_version }}"
+          - "Kernel: {{ ansible_kernel }}"
+          - "Architecture: {{ ansible_architecture }}"
+
+    - name: Check filesystem usage
+      ansible.builtin.command: df -hT
+      changed_when: false
+      register: filesystem_usage
+
+    - name: Show filesystem usage
+      ansible.builtin.debug:
+        var: filesystem_usage.stdout_lines
+
+    - name: Check memory usage
+      ansible.builtin.command: free -h
+      changed_when: false
+      register: memory_usage
+
+    - name: Show memory usage
+      ansible.builtin.debug:
+        var: memory_usage.stdout_lines
+
+    - name: Check system load
+      ansible.builtin.command: uptime
+      changed_when: false
+      register: uptime_output
+
+    - name: Show uptime
+      ansible.builtin.debug:
+        var: uptime_output.stdout
+
+    - name: Check failed systemd units
+      ansible.builtin.command: systemctl --failed --no-pager
+      changed_when: false
+      failed_when: false
+      register: failed_units
+
+    - name: Show failed systemd units
+      ansible.builtin.debug:
+        var: failed_units.stdout_lines
+
+    - name: Check kernel semaphore settings
+      ansible.builtin.command: sysctl kernel.sem
+      changed_when: false
+      failed_when: false
+      register: kernel_sem
+
+    - name: Show kernel semaphore settings
+      ansible.builtin.debug:
+        var: kernel_sem.stdout

@@ -1,0 +1,16 @@
+.env
+*.log
+*.tmp
+.DS_Store
+Thumbs.db
+
+# Local runtime output
+reports/
+tmp/
+
+# Editor settings
+.vscode/
+
+# Python cache if helper scripts are added later
+__pycache__/
+*.pyc
